@@ -1,0 +1,4 @@
+fastapi==0.112.0
+uvicorn==0.30.5
+pillow==9.3.0  # For handling image files
+python-multipart==0.0.9
