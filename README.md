@@ -27,9 +27,9 @@ The project directory is organized as follows:
 ml_api/
 ├── app/
 │   ├── main.py
-│   ├── models/
-│   │   ├── model_1.py
-│   │   ├── model_2.py
+│   ├── ml_models/
+│   │   ├── ml_model_1.py
+│   │   ├── ml_model_2.py
 │   │   └── ...
 │   ├── utils/
 │   │   ├── preprocessing.py
@@ -46,8 +46,8 @@ ml_api/
 ```
 
 - **`app/main.py`**: The main FastAPI application file.
-- **`app/model_1.py`**: Mock model for inference.
-- **`app/model_2.py`**: Another mock model for inference.
+- **`app/ml_model_1.py`**: Mock model for inference.
+- **`app/ml_model_2.py`**: Another mock model for inference.
 - **`requirements.txt`**: List of Python dependencies.
 - **`Dockerfile`**: Dockerfile for containerizing the application.
 
@@ -65,8 +65,8 @@ ml_api/
    Create a virtual environment (optional but recommended) and install the dependencies:
 
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   python -m venv ML_API
+   source ML_API/bin/activate  # On Windows use `ML_API\Scripts\activate`
    pip install -r requirements.txt
    ```
 
@@ -121,7 +121,7 @@ ml_api/
    - **Using Curl**:
 
      ```bash
-     curl -X POST "http://localhost:8000/inference" -F "file=@path_to_your_image.jpg" -F "model_name=model_1"
+     curl -X POST "http://localhost:8000/inference" -F "file=@path_to_your_image.jpg" -F "model_name=ml_model_1"
      ```
 
    - **Using Postman**:
