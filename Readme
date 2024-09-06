@@ -1,0 +1,15 @@
+plant_disease_classifier/
+│
+├── app/
+│   ├── __init__.py
+│   ├── main.py  # FastAPI application
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── model_loader.py  # Code to load and manage models
+│   └── utils/
+│       ├── __init__.py
+│       ├── image_utils.py  # Utility functions for handling images
+│       └── s3_utils.py     # Utility functions for handling AWS S3 presigned URLs
+│
+├── requirements.txt  # Python dependencies
+└── Dockerfile        # Docker setup (optional)

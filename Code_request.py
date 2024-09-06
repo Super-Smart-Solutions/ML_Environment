@@ -1,0 +1,16 @@
+import requests
+
+url = "http://127.0.0.1:8000/predict"
+
+# Define the request payload
+payload = {
+  "model_name": "Mango",
+  "presigned_url": "https://plant-diseases-bucket.s3.eu-central-1.amazonaws.com/mango/mango1.jpeg?response-content-disposition=inline&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEOj%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDGV1LWNlbnRyYWwtMSJIMEYCIQDuDLkkW%2BlaWT00C9PBs5XA0nGqFbCyx2z1IMvWtChmwwIhAMz6A9rc5mZktg4qfBG9pLqVPWGK1X1gtJaybhejcFlpKuQCCBEQABoMMjExMTI1NjYzNTIwIgyuLOUswEOsygccLwIqwQJJYwSaJhnceBIVXIE0Q2bHUQ8SzrcSOxwr5TiDjLBArL0hFsqi%2Faz8SvqglhzgaJWeMSfJ0nkGIGAUQJnWgNJM0BsgZfhrglm9o4meSZLfAHdlKKE%2FIupdFdFg2rgcwOevQhbI7pk%2BaO9MKRnj%2BGqTdck6LAmrYgbtP%2F5Tn92thBe6yFWimus2%2BpOCDQAGe4z5KhdMcP8zah00WkIxUCzxduvem8h8xBfXcdQwJYBHLnAPUjsYr4%2FqezZQNGrJj6u4kAcp%2BbzMhfl%2Fk5jhAmaelM0U%2FDtEFvuExeYxOlygo0maWG0X%2FRTolPl%2FaB49SlBre2EdarXz8BYHloAypp9FWpLPSrCD4bulcUOo96zcUO94kRceQv%2BtmNezM79dxeVj7epEoSHQ7D%2FK9YqQsOhp8wNd8XhXR84T0Zal%2FrHdFScwp%2FDqtgY6sgIgKMuvt8Wj3ooyei6018WbkpYohb3WnXuo33NEZfbfbIclVAP5GGp8Oeut4H6E1OpjHruGX8aY%2FZ%2BSL5tYyqfEYj9wq9rkeDvR%2FqI48OJm8NUXAcx0I%2FZqwYT5ILQpoJHarxxTqVWVuOutTnRhSWg1iUG8c5y8goCfpyn3gyUumk9wl8QK8KidbuffVxVlNlEJJFnANObn4xki5uB%2FPMmNEuciL7ZfGvZJ8VL23rbwSA69MhtU9LogMdA2jvoUPgfp22wz7Fm1GomLUhSLvUqcQPQ0irA49h8cyHA8hb83UfIYp9DheyISccIRRmntnPJx%2FtliioaDYNq%2BB39NVee6KDeRAww3RwF3PPAMB5%2FgIaaAGb56IIzZfRuB1RDDMLcFDQe9gSS%2B8S%2FwYNOyvRoXY40%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240906T080951Z&X-Amz-SignedHeaders=host&X-Amz-Expires=21600&X-Amz-Credential=ASIATCKAR64QOZC3OTLB%2F20240906%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Signature=92e42ddcf236dea65d18ee78543f27ed1d0c61c73501282b6e906f8d7bc92d1a"
+}
+
+# Send the POST request
+response = requests.post(url, json=payload)
+
+# Print the response
+print(response.json())
+

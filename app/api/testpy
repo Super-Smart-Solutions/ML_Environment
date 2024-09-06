@@ -1,0 +1,37 @@
+import boto3
+from io import BytesIO
+from PIL import Image
+import requests
+
+def download_image_from_s3(presigned_url: str):
+    """
+    Downloads an image from an AWS S3 presigned URL.
+
+    :param presigned_url: The presigned URL for the S3 object.
+    :return: A PIL image object.
+    """
+    try:
+        print(f"Attempting to download image from URL: {presigned_url}")
+        response = requests.get(presigned_url)
+        
+        # Check if the request was successful
+        if response.status_code == 200:
+            print("Image downloaded successfully.")
+            image = Image.open(BytesIO(response.content))
+            return image
+        else:
+            print(f"Failed to download image. Status code: {response.status_code}")
+            response.raise_for_status()
+    
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+
+# Example usage
+#presigned_url = "https://plant-diseases-bucket.s3.eu-central-1.amazonaws.com/Class%20M/Class%20M_1.jpg?response-content-disposition=inline&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEFwaDGV1LWNlbnRyYWwtMSJIMEYCIQDQCtu8ykGyPkzKjVBFHx%2Fls%2BxY40KUlpxn4NclRe4i6wIhAKGMI8DZepVAleMeqYjRn4Saly9tGTqSmd0jM2zNIft%2BKuQCCHUQABoMMjExMTI1NjYzNTIwIgxksjhwe1yC2KsliKwqwQLfKWF%2FX3mfcCImM%2FPzz5i9NfqGy9sPLiXu7JhXZr0mlxCOPHeA51No6Y3gnD%2BEIgTqWTcrGRSLFGUUsRj6Fd5%2FgH0T0XVkVKiymNb4L9YfzcnriwadFdKQ3%2F449zKl4I29%2B7SsMcPjWM0A1Wpy447f2jC2%2FZ%2BEKFV6hnUtrrIDonnERPxu1J4s%2F%2BQbEUJVq1PClepoukP6CfMsy4ylwJR2r29ofSZW2g7y%2FBXfNB7zzD07sGyB04ZStCvkyDg48bI4jGAFjK3D5d1HlnsJ3JdyCcuTZ%2BiBH3KZfK72EIaSpzOP1HBV0g9%2F%2BKtwY6e7%2Bgm5QZKwRBiajhV1WSFGziR%2FlD72u6B6hrCddH9fHiabEhOQqu6E23AiNru%2BetOxil7yw8h5qFMln2cImtHUFScWCC%2FXsqHCtlmXskOD4jIg9wAw44vMtgY6sgJw7Hv3%2F0ODyV8wn6Wze%2FNypmBQeitivdx0V%2FQkQGXMJSyLr7HysmplFKa2DP7cDWObIX1EjhIgrnK5byO3eCEHIBDHFkp%2FQE%2F7tKaklMtOZmlcXSxWNzVXsSp7LEm3nrrmVhOU9XzVyCY%2BTLtdYkM0rpdS6WF1YRXmBC6buCb76%2Fex0ghH8ejXgbuhbE6hvQkvtzFRSv7BZL1vi0jLkrqxZ6Rj7nSf9Rj6nbqjgnuA8OLs8S4TypUYjXuhdbSXf57Pziu7LtTyvP5vvFv9lgDE9LMK%2B9Ap%2B7oiUkWe1eWHfKxIL9ZWW7T%2FFZMPWi%2FwSzKEKPXDmvImcVfFtPrJQEHKdRb%2B14FTTNKX5O06PZeMfcs16XyW8I%2BM%2FRHVy%2BieL%2FIGoE5SYjYJGdZUpAjY8j8%2BahA%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240831T120213Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIATCKAR64QPVLEIBNG%2F20240831%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Signature=d7c26736e22d3366ffdc1199b8847afb9c40bc5444a8c5c0d73657d8c921103b"
+presigned_url ="s3://plant-diseases-bucket/Class M/Class M_1.jpg"
+image = download_image_from_s3(presigned_url)
+if image:
+    image.show()  # This will open the image if downloaded successfully
+else:
+    print("Image could not be retrieved.")
