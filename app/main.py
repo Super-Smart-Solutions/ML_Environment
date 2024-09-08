@@ -33,6 +33,6 @@ def main() -> None:
 
 
 
-# Entry point for running the app directly (if not using a dedicated ASGI server)
+# Entry point for running the app
 if __name__ == "__main__":
     main()
