@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     with environment variables.
     """
     APP_NAME: str = "Pest Identification ML API"
-    host: str = "127.0.0.1"
+    host: str = "0.0.0.0"
     port: int = 8000
     # no. of workers for uvicorn
     # using 1 in dev envionment 
