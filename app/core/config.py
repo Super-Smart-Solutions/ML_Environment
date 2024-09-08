@@ -1,4 +1,5 @@
 import enum
+import os
 from pydantic import BaseSettings
 
 class LogLevel(str, enum.Enum):
@@ -30,7 +31,7 @@ class Settings(BaseSettings):
     reload: bool = True
 
     # Current Environment
-    ENVIRONMENT: str = "dev"
+    ENVIRONMENT: str = os.getenv('NAME', 'dev')
     log_level: LogLevel = LogLevel.INFO
 
     #AWS S3
