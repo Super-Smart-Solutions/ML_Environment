@@ -1,7 +1,6 @@
 import enum
 import os
-from pydantic import BaseSettings
-
+from pydantic_settings import BaseSettings, SettingsConfigDict
 class LogLevel(str, enum.Enum):
     """Possible log levels."""
 
