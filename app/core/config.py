@@ -1,7 +1,15 @@
-# app/core/config.py
-
+import enum
 from pydantic import BaseSettings
 
+class LogLevel(str, enum.Enum):
+    """Possible log levels."""
+
+    NOTSET = "NOTSET"
+    DEBUG = "DEBUG"
+    INFO = "INFO"
+    WARNING = "WARNING"
+    ERROR = "ERROR"
+    FATAL = "FATAL"
 
 class Settings(BaseSettings):
     """
@@ -23,6 +31,7 @@ class Settings(BaseSettings):
 
     # Current Environment
     ENVIRONMENT: str = "dev"
+    log_level: LogLevel = LogLevel.INFO
 
     #AWS S3
     S3_BUCKET_NAME: str = ""

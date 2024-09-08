@@ -1,5 +1,3 @@
-# app/core/lifetime.py
-
 from typing import Awaitable, Callable
 
 def register_startup_event(
