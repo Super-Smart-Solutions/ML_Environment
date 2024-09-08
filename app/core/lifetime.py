@@ -1,4 +1,5 @@
 from typing import Awaitable, Callable
+from fastapi import FastAPI
 
 def register_startup_event(
     app: FastAPI,
