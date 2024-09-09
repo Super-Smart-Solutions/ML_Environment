@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "ml-api"
+version = "1.0.0"
+description = "APIs For ML Models"
+authors = [
+"Mahmoud Ayman <mahmoud.ayman07@gmail.com>", 
+"Ahmed Samy <ahmed.samy18296@gmail.com>", 
+]
+readme = "README.md"
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.112.2"
+uvicorn = "^0.30.6"
+pillow = "^10.4.0"
+python-multipart = "^0.0.9"
+pydantic = "^2.9.0"
+gunicorn = "^23.0.0"
+uvloop = "^0.20.0"
+pydantic-settings = "^2.4.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

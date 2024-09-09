@@ -41,7 +41,7 @@ ml_api/
 │       ├── inference.py
 │       └── healthcheck.py
 ├── Dockerfile
-├── requirements.txt
+├── pyproject.toml
 └── README.md
 ```
 
@@ -62,22 +62,23 @@ ml_api/
 
 2. **Install Python Dependencies**
 
-   Create a virtual environment (optional but recommended) and install the dependencies:
+   Install Poetry if you haven't already, and then use it to install dependencies:
 
    ```bash
-   python -m venv ML_API
-   source ML_API/bin/activate  # On Windows use `ML_API\Scripts\activate`
-   pip install -r requirements.txt
+   curl -sSL https://install.python-poetry.org | python3 -
+   export PATH="/root/.local/bin:${PATH}"
+   poetry install
+
    ```
 
 ## Running the Application Locally
 
 1. **Run the FastAPI Application**
 
-   Start the FastAPI application using Uvicorn:
+   Start the FastAPI application using Uvicorn within the Poetry environment:
 
    ```bash
-   uvicorn app.main:app --reload
+   poetry run uvicorn app.main:app --reload
    ```
 
    The application will be available at `http://localhost:8000`.
