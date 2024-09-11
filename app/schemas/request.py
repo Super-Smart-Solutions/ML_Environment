@@ -1,5 +1,5 @@
 from pydantic import BaseModel
 
 class InferenceRequest(BaseModel):
-    param1: int = 10
-    param2: str = "default"
+    model_name: str
+    presigned_url: str

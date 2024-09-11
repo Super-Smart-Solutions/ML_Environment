@@ -1,15 +1,14 @@
 import os
-
 import uvicorn
 from app.core.config import settings
 from app.core.gunicorn_runner import GunicornApplication
-
+from app.api.inference import app  # Import the FastAPI app
 
 def main() -> None:
     """Entrypoint of the application."""
     if settings.reload:
         uvicorn.run(
-            "app.core.application:get_app",
+            "app.api.inference:app",
             workers=settings.workers_count,
             host=settings.host,
             port=settings.port,
@@ -18,10 +17,9 @@ def main() -> None:
             factory=True,
         )
     else:
-        # gunicorn in production for better stability
-        # reload is off,
+        # Gunicorn in production for better stability
         GunicornApplication(
-            "app.core.application:get_app",
+            "app.api.inference:app",
             host=settings.host,
             port=settings.port,
             workers=settings.workers_count,
