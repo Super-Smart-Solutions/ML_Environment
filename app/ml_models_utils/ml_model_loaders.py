@@ -1,27 +1,47 @@
+# app/ml_models_utils/ml_model_loaders.py
+
+import os
+import tempfile
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.applications import InceptionV3
 from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, LayerNormalization, Dropout
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras import backend as K
-import os
+import boto3
 
 class ModelManager:
-    def __init__(self, model_paths):
+    def __init__(self, model_paths, use_s3=False, s3_bucket=None):
         """
-        Initializes the ModelManager with a dictionary of model paths.
+        Initialize ModelManager to handle loading models locally or from S3.
 
-        :param model_paths: Dictionary with plant names as keys and model paths as values.
+        Args:
+            model_paths (dict): A dictionary of plant names and their corresponding model paths.
+            use_s3 (bool): Set to True if models are stored in S3.
+            s3_bucket (str): The name of the S3 bucket (if using S3).
         """
         self.model_paths = model_paths
         self.models = {}
+        self.use_s3 = use_s3
+        self.s3_bucket = s3_bucket
+        if use_s3:
+            self.s3_client = boto3.client('s3')
 
-    def load_model(self, plant_name: str, cls_no: int = 2):
+    def load_all_models(self):
         """
-        Loads and returns the model for the given plant.
+        Load all models defined in the model_paths dictionary.
+        """
+        for plant_name in self.model_paths:
+            self.load_model(plant_name)
 
-        :param plant_name: The name of the plant.
-        :param cls_no: Number of classes for the classification.
-        :return: A compiled Keras model ready for inference.
+    def load_model(self, plant_name: str):
+        """
+        Load a specific model based on plant name, either locally or from S3.
+
+        Args:
+            plant_name (str): The name of the plant (e.g., 'Mango', 'Guava').
+        
+        Returns:
+            Model: The loaded Keras model.
         """
         if plant_name in self.models:
             return self.models[plant_name]
@@ -31,24 +51,54 @@ class ModelManager:
 
         model_path = self.model_paths[plant_name]
 
-        if not os.path.exists(model_path):
-            raise FileNotFoundError(f"The model file at {model_path} was not found.")
+        if self.use_s3:
+            model = self.load_model_from_s3(plant_name, model_path)
+        else:
+            if not os.path.exists(model_path):
+                raise FileNotFoundError(f"The model file at {model_path} was not found.")
+            model = self.build_and_load_model(plant_name, model_path)
+
+        self.models[plant_name] = model
+        return model
+
+    def load_model_from_s3(self, plant_name, model_key):
+        """
+        Load a model file from S3 and build the model.
+
+        Args:
+            plant_name (str): The name of the plant.
+            model_key (str): The S3 key for the model file.
         
-        # Adjust cls_no to 8 if the plant_name is Mango
-        if plant_name == 'Mango':
-            cls_no = 8
+        Returns:
+            Model: The loaded Keras model.
+        """
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.h5') as temp_file:
+            temp_filepath = temp_file.name
+        
+        self.s3_client.download_file(self.s3_bucket, model_key, temp_filepath)
+        
+        model = self.build_and_load_model(plant_name, temp_filepath)
+        
+        os.unlink(temp_filepath)
+        
+        return model
 
-        # Adjust cls_no to 5 if the plant_name is Guava
-        if plant_name == 'Guava':
-            cls_no = 5 
+    def build_and_load_model(self, plant_name, model_path):
+        """
+        Build and load the model architecture, compile it, and load its weights.
 
-        # Adjust cls_no to 3 if the plant_name is Grape
-        if plant_name == 'Grape':
-            cls_no = 3         
-
+        Args:
+            plant_name (str): The name of the plant (used for determining class count).
+            model_path (str): The file path to the model weights.
+        
+        Returns:
+            Model: The compiled Keras model with loaded weights.
+        """
+        cls_no = self.get_class_number(plant_name)
         image_size = (256, 256)
         base_model = InceptionV3(include_top=False, weights='imagenet', input_shape=(*image_size, 3))
 
+        # Build the custom classification layers on top of InceptionV3
         x = base_model.output
         x = GlobalAveragePooling2D()(x)
         x = Dense(512, activation='relu')(x)
@@ -69,29 +119,61 @@ class ModelManager:
 
         model = Model(inputs=base_model.input, outputs=predictions)
 
-        def recall_m(y_true, y_pred):
-            true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-            possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
-            recall = true_positives / (possible_positives + K.epsilon())
-            return recall
-
-        def precision_m(y_true, y_pred):
-            true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-            predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
-            precision = true_positives / (predicted_positives + K.epsilon())
-            return precision
-
-        def f1_m(y_true, y_pred):
-            precision = precision_m(y_true, y_pred)
-            recall = recall_m(y_true, y_pred)
-            return 2 * ((precision * recall) / (precision + recall + K.epsilon()))
-
+        # Compile the model with custom metrics
         model.compile(
             optimizer=Adam(learning_rate=0.0001),
             loss=loss_function,
-            metrics=['accuracy', f1_m, precision_m, recall_m]
+            metrics=['accuracy', self.f1_m, self.precision_m, self.recall_m]
         )
 
         model.load_weights(model_path)
-        self.models[plant_name] = model
         return model
+
+    @staticmethod
+    def get_class_number(plant_name):
+        """
+        Get the number of output classes for the given plant name.
+        
+        Args:
+            plant_name (str): The name of the plant.
+        
+        Returns:
+            int: The number of classes for the plant.
+        """
+        if plant_name == 'Mango':
+            return 8
+        elif plant_name == 'Guava':
+            return 5
+        elif plant_name == 'Grape':
+            return 3
+        else:
+            return 2
+
+    @staticmethod
+    def recall_m(y_true, y_pred):
+        """
+        Custom recall metric.
+        """
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+        recall = true_positives / (possible_positives + K.epsilon())
+        return recall
+
+    @staticmethod
+    def precision_m(y_true, y_pred):
+        """
+        Custom precision metric.
+        """
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+        precision = true_positives / (predicted_positives + K.epsilon())
+        return precision
+
+    @staticmethod
+    def f1_m(y_true, y_pred):
+        """
+        Custom F1-score metric.
+        """
+        precision = ModelManager.precision_m(y_true, y_pred)
+        recall = ModelManager.recall_m(y_true, y_pred)
+        return 2 * ((precision * recall) / (precision + recall + K.epsilon()))

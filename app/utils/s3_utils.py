@@ -1,10 +1,8 @@
-import io
-from io import BytesIO
-from PIL import Image
 import requests
+from PIL import Image
+from io import BytesIO
 
-
-def download_image_from_s3(presigned_url: str):
+def download_image_from_s3(presigned_url: str) -> Image.Image:
     """
     Downloads an image from an AWS S3 presigned URL.
 
@@ -15,4 +13,3 @@ def download_image_from_s3(presigned_url: str):
     response.raise_for_status()
     image = Image.open(BytesIO(response.content))
     return image
-

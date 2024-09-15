@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     log_level: LogLevel = LogLevel.INFO
 
     #AWS S3
-    S3_BUCKET_NAME: str = ""
+    AWS_DEFAULT_REGION: str = ""
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
     AWS_BUCKET_NAME: str = ""

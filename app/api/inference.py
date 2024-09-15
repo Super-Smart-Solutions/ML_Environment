@@ -1,17 +1,21 @@
-from fastapi import APIRouter, UploadFile, File
-from app.models import model_1, model_2
+from fastapi import APIRouter, HTTPException
 from app.schemas.request import InferenceRequest
-from app.schemas.response import InferenceResponse
+from app.services.model_inference import run_inference_service
 
 router = APIRouter()
 
-@router.post("/inference", response_model=InferenceResponse)
-async def run_inference(file: UploadFile = File(...), model_name: str = "model_1", params: InferenceRequest = None):
-    if model_name == "model_1":
-        prediction = model_1.predict(file.file, params)
-    elif model_name == "model_2":
-        prediction = model_2.predict(file.file, params)
-    else:
-        return {"error": "Model not found"}
-    
-    return {"prediction": prediction}
+@router.post("/predict")
+async def run_inference(request: InferenceRequest):
+    try:
+        result = await run_inference_service(request.model_name, request.presigned_url)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/reload_model/{model_name}")
+async def reload_model(model_name: str):
+    try:
+        result = await run_inference_service.reload_model(model_name)
+        return {"message": f"Model {model_name} reloaded successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

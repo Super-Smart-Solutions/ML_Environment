@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 
-def preprocess_image(image: Image.Image, target_size=(256, 256)):
+def preprocess_image(image: Image.Image, target_size=(256, 256)) -> np.ndarray:
     """
     Preprocess the image for model inference.
 

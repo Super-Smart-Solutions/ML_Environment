@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+from typing import List
 
 class InferenceResponse(BaseModel):
-    prediction: dict
+    predicted_class: int
+    predictions: List[float]
