@@ -1,8 +1,9 @@
 import os
-
 import uvicorn
 from app.core.config import settings
+from app.core.application import get_app
 from app.core.gunicorn_runner import GunicornApplication
+
 
 
 def main() -> None:
@@ -36,3 +37,6 @@ def main() -> None:
 # Entry point for running the app
 if __name__ == "__main__":
     main()
+
+
+    
