@@ -1,0 +1,25 @@
+{
+  "Pomegranate": {
+    "Mediterranean fruit fly": 0,
+    "Pomegranate butterfly": 1,
+    "Pomegranate moth": 2
+  },
+  "Rose": {
+    "Black spot of roses": 0,
+    "Downy mildew": 1,
+    "Rose rust": 2,
+    "Western flower thrips": 3,
+    "Powdery mildew": 4
+  },
+  "Citrus": {
+    "Citrus mealybug": 0,
+    "Decline Quick": 1,
+    "Gummosis": 2,
+    "Mediterranean fruit fly": 3
+  },
+  "Grape": {
+    "Downey mildew": 0,
+    "Grape mealybug": 1,
+    "Powdery mildew": 2
+  }
+}

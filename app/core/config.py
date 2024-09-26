@@ -37,13 +37,14 @@ class Settings(BaseSettings):
     AWS_DEFAULT_REGION: str = ""
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
-    AWS_BUCKET_NAME: str = ""
+    AWS_WEIGHTS_BUCKET_NAME: str = ""
+    AWS_IMAGES_BUCKET_NAME: str = ""
 
     #Weights [relative path]
     WEIGHTS_DIR: str = "./weights"
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=os.path.join(os.path.dirname(__file__), "../.env"),
         env_prefix="ML_APIS_",
         env_file_encoding="utf-8",
     )

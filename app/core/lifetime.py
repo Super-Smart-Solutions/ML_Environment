@@ -1,6 +1,6 @@
 from typing import Awaitable, Callable
 from fastapi import FastAPI
-
+from app.utils.utils import get_classes
 def register_startup_event(
     app: FastAPI,
 ) -> Callable[[], Awaitable[None]]:  # pragma: no cover
@@ -13,6 +13,7 @@ def register_startup_event(
     async def _startup() -> None:
         app.middleware_stack = None
         app.middleware_stack = app.build_middleware_stack()
+        classes = await get_classes()
     return _startup
 
 

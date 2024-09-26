@@ -8,6 +8,7 @@ from app.core.gunicorn_runner import GunicornApplication
 
 def main() -> None:
     """Entrypoint of the application."""
+    print("Loaded settings:", settings.dict())
     if settings.reload:
         uvicorn.run(
             "app.core.application:get_app",
