@@ -11,7 +11,12 @@ from typing import List
 
 async def run_inference_service(model_name: str, presigned_url: str) -> InferenceResponse:
     # Load model from cache or S3
-    model = model_manager.load_model(model_name)
+    try:
+        model = model_manager.load_model(model_name)
+    except FileNotFoundError as e:
+        return None 
+    else:
+        raise e
 
     # Download and preprocess the image from S3
     image = download_image_from_s3(presigned_url)

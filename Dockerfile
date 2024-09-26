@@ -32,6 +32,8 @@ RUN apt-get purge -y \
 COPY . /app/src/
 RUN --mount=type=cache,target=/tmp/poetry_cache poetry install --only main
 
+VOLUME ["/app/src/weights"]
+
 CMD ["/usr/local/bin/python", "-m", "app"]
 
 # Define environment variable

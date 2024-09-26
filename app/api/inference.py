@@ -9,6 +9,8 @@ router = APIRouter()
 async def run_inference(request: InferenceRequest):
     try:
         result = await run_inference_service(request.model_name, request.presigned_url)
+        if not result:
+            raise HTTPException(status_code=400, detail=f"model {request.model_name} not found, try to reload.")        
         return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
