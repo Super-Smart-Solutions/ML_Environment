@@ -1,5 +1,5 @@
 import os
-import boto3
+import aioboto3
 from tensorflow import keras
 from app.core.config import settings  # Import settings for AWS credentials
 from fastapi import HTTPException
@@ -29,32 +29,38 @@ class ModelManager:
             raise FileNotFoundError(f"Model {model_name} not found at {model_file_path}")
 
 
-    def _load_model_from_s3(self, bucket_name: str, model_name: str,):
-        """
-        Download the model file from S3 and load it into memory.
-        """
-        try:
-            print(f"Loading model from S3: {bucket_name}/{model_name}")
 
-            # Initialize S3 client using credentials from settings
-            s3_client = boto3.client(
-                's3',
-                region_name=settings.AWS_DEFAULT_REGION,
-                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
-            )
+
+async def _load_model_from_s3(self, bucket_name: str, model_name: str):
+    """
+    Download the model file from S3 and load it into memory.
+    """
+    try:
+        print(f"Loading model from S3: {bucket_name}/{model_name}")
+
+        # Initialize S3 client using aioboto3
+        async with aioboto3.client(
+            's3',
+            region_name=settings.AWS_DEFAULT_REGION,
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
+        ) as s3_client:
 
             model_key = f"{model_name}/{model_name}_model.keras"
-            file_path=os.path.join(self.model_directory,"{model_name}")
-            #create the directory for the weights
+            file_path = os.path.join(self.model_directory, model_key)
+
+            # Create the directory for the weights
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
             # Download the model file from S3
-            s3_client.download_file(bucket_name, model_key, file_path)
+            await s3_client.download_file(bucket_name, model_key, file_path)
             print(f"Model downloaded to: {file_path}")
 
             # Load the model from the downloaded file
-            # model = keras.models.load_model(local_file_path, compile=False)
+            # model = keras.models.load_model(file_path, compile=False)
             return self.load_model(model_name)
-        except Exception as e:
-            print(f"Error loading model from S3: {str(e)}")
-            raise HTTPException(status_code=500, detail=f"Failed to load model from S3: {str(e)}")
+
+    except Exception as e:
+        print(f"Error loading model from S3: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to load model from S3: {str(e)}")
+

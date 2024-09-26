@@ -15,7 +15,7 @@ async def run_inference(request: InferenceRequest):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.post("/reload_model/{model_name}")
+@router.post("/reload_models/{model_name}")
 async def reload_model(model_name: str):
     try:
         await run_inference_service.reload_model(model_name)
