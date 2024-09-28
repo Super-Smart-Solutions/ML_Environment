@@ -40,8 +40,8 @@ class Settings(BaseSettings):
     AWS_WEIGHTS_BUCKET_NAME: str = ""
     AWS_IMAGES_BUCKET_NAME: str = ""
 
-    #Weights [relative path]
-    WEIGHTS_DIR: str = "./weights"
+    #Weights [absolute path]
+    WEIGHTS_DIR: str = os.path.join(os.path.dirname(__file__), "../weights")
 
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(__file__), "../.env"),
@@ -51,3 +51,4 @@ class Settings(BaseSettings):
 
 # Instantiate the settings
 settings = Settings()
+

@@ -6,7 +6,8 @@ from functools import wraps
 from typing import Optional, Callable
 import asyncio
 from app.core.config import settings
-
+import os
+from pathlib import Path
 
 def download_image_from_s3(presigned_url: str) -> Image.Image:
     """
@@ -30,6 +31,16 @@ async def s3_download_object(bucket_name: str, key: str, file_path: str):
     :file_path: path to write the downloaded object
     :return: path of the downloaded file.
     """
+    #print("raw_path", file_path)
+
+    saved_file_path = Path(file_path).joinpath(key)
+    saved_file_dir= saved_file_path.parent
+    #print("file_path", saved_file_path)
+    #print("dir_path", saved_file_dir)
+    if saved_file_path.is_file():
+        return saved_file_path
+    if not os.path.exists(saved_file_dir):
+        os.makedirs(saved_file_dir, exist_ok=True)
     async with aioboto3.Session().client(
         "s3",
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -37,12 +48,12 @@ async def s3_download_object(bucket_name: str, key: str, file_path: str):
         region_name=settings.AWS_DEFAULT_REGION
     ) as s3_client:
         try:
-            await s3_client.download_file(bucket_name, key, file_path)
-            return file_path
+            await s3_client.download_file(bucket_name, key, saved_file_path)
+            return saved_file_path
         except Exception as e:
             raise e
 
-def s3_download_object_decorator(bucket_name: str, object_key: str, file_path: str, modify_function: Optional[Callable] = None):
+def s3_download_object_decorator(bucket_name: str, file_path: str, modify_function: Optional[Callable] = None):
     """
     A decorator to add S3 utility wrapper to any function.
 
@@ -54,7 +65,7 @@ def s3_download_object_decorator(bucket_name: str, object_key: str, file_path: s
     """
     def decorator(func):
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(object_key: str,*args, **kwargs):
             downloaded_file_path = await s3_download_object(bucket_name, object_key, file_path)
             if modify_function:
                 result = await modify_function(downloaded_file_path)

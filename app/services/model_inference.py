@@ -1,6 +1,6 @@
 from app.utils.s3_utils import download_image_from_s3
 from app.utils.image_utils import preprocess_image
-from app.ml_models_utils.ml_model_loaders import ModelManager
+from app.ml_models_utils.model_manager import ModelManager
 from app.schemas.response import InferenceResponse
 import numpy as np
 
