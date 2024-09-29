@@ -1,36 +1,44 @@
-from app.utils.s3_utils import s3_download_object_decorator
 from app.core.config import settings
 import json
-from app.services.model_inference import model_manager
 import asyncio
+import os
 
-MODEL_CLASSES = {}
+def initialize_model_version()->bool:
+	if not os.path.exists(settings.WEIGHTS_DIR):
+		os.makedirs(settings.WEIGHTS_DIR, exist_ok=True)
 
-@s3_download_object_decorator(
-	bucket_name=settings.AWS_WEIGHTS_BUCKET_NAME,
-	file_path=settings.WEIGHTS_DIR
-)
-async def get_classes(downloaded_file_path, object_key: str = ""):
-	global MODEL_CLASSES
-	try:
-		with open(downloaded_file_path, 'r') as file:
-			MODEL_CLASSES = json.load(file)
-	except Exception as e:
-		raise e
+	if not os.path.exists(settings.VERSIONS_PATH):
+		with open(settings.VERSIONS_PATH, 'w') as json_file:
+			json.dump({"models": {}}, json_file)
 
+def update_model_version(model_name: str, version: str):
+	# Check if the JSON file exists; if not, create an empty one
+	if not os.path.exists(settings.VERSIONS_PATH):
+		raise FileNotFoundError
 
-async def preload_models():
-	try:
-		result = await get_classes(object_key="classes.json")
-	except Exception as e:
-		raise e
+	# Load the existing data from the JSON file
+	with open(settings.VERSIONS_PATH, 'r') as json_file:
+		data = json.load(json_file)
 
+	# Update or add the version for the given model_name
+	data["models"][model_name] = {"version": version}
 
-	for i in MODEL_CLASSES.keys():
-		print("Model: ", i)
-		result = await model_manager._load_model_from_s3(i)
+	# Save the updated data back to the JSON file
+	with open(settings.VERSIONS_PATH, 'w') as json_file:
+		json.dump(data, json_file, indent=4)
 
-	return True
-
+	print(f"Updated {model_name} with version {version}")
 	
-		
+def get_model_version(model_name: str) -> str | None:
+	if not os.path.exists(settings.VERSIONS_PATH):
+		raise FileNotFoundError
+
+	with open(settings.VERSIONS_PATH, 'r') as json_file:
+		data = json.load(json_file)
+
+	if model_name in data.get("models", {}):
+		return data["models"][model_name]["version"]
+	else:
+		return None
+
+

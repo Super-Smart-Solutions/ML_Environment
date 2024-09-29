@@ -8,6 +8,7 @@ import asyncio
 from app.core.config import settings
 import os
 from pathlib import Path
+from app.utils.utils import get_model_version, update_model_version
 
 def download_image_from_s3(presigned_url: str) -> Image.Image:
     """
@@ -31,16 +32,16 @@ async def s3_download_object(bucket_name: str, key: str, file_path: str):
     :file_path: path to write the downloaded object
     :return: path of the downloaded file.
     """
-    #print("raw_path", file_path)
 
     saved_file_path = Path(file_path).joinpath(key)
     saved_file_dir= saved_file_path.parent
-    #print("file_path", saved_file_path)
-    #print("dir_path", saved_file_dir)
-    if saved_file_path.is_file():
-        return saved_file_path
+    model_name = saved_file_dir.name
+
+    #check if the file exist
+
     if not os.path.exists(saved_file_dir):
         os.makedirs(saved_file_dir, exist_ok=True)
+
     async with aioboto3.Session().client(
         "s3",
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -48,7 +49,18 @@ async def s3_download_object(bucket_name: str, key: str, file_path: str):
         region_name=settings.AWS_DEFAULT_REGION
     ) as s3_client:
         try:
+            # get the S3 Object version
+            response = await s3_client.head_object(Bucket=bucket_name, Key=key)
+            file_version_id = response.get('VersionId', 'null')
+            if saved_file_path.is_file():
+                #check the current file version
+                current_file_version = get_model_version(model_name)
+                if (file_version_id == 'null') or (file_version_id == current_file_version) :
+                    print("identical version")
+                    return saved_file_path
+            print(f"downloading {model_name}")
             await s3_client.download_file(bucket_name, key, saved_file_path)
+            update_model_version(model_name, file_version_id)
             return saved_file_path
         except Exception as e:
             raise e

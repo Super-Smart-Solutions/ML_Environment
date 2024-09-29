@@ -42,6 +42,7 @@ class Settings(BaseSettings):
 
     #Weights [absolute path]
     WEIGHTS_DIR: str = os.path.join(os.path.dirname(__file__), "../weights")
+    VERSIONS_PATH: str = os.path.join(os.path.dirname(__file__), "../weights/versions.json")
 
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(__file__), "../.env"),

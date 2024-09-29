@@ -1,6 +1,6 @@
 from typing import Awaitable, Callable
 from fastapi import FastAPI
-from app.utils.utils import preload_models
+from app.utils.model_utils import preload_models
 def register_startup_event(
     app: FastAPI,
 ) -> Callable[[], Awaitable[None]]:  # pragma: no cover
