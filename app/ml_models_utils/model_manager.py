@@ -14,6 +14,8 @@ from tensorflow.keras.models import load_model
 class ModelManager:
     def __init__(self):
         self.model_directory = settings.WEIGHTS_DIR
+        self.loaded_models ={}
+        self.class_dict = {}
 
 
     @lru_cache(maxsize=10)
@@ -28,7 +30,8 @@ class ModelManager:
         # Check if model file exists locally
         if os.path.exists(model_file_path):
             #print(f"Loading model from local file: {model_file_path}")
-            return load_model(model_file_path)
+            model = load_model(model_file_path)
+            self.loaded_models[model_name] = model
         else:
             #print(f"File not found: {model_file_path}")
             raise FileNotFoundError(f"Model {model_name} not found at {model_file_path}")
@@ -54,6 +57,6 @@ class ModelManager:
 
         if result:
             # Load the model from the downloaded file
-            return self.load_model(model_name)
+            self.load_model(model_name)
         else:
             raise Exception(f"Failed to retrive model {model_name}, from bucket {settings.AWS_WEIGHTS_BUCKET_NAME}.")
