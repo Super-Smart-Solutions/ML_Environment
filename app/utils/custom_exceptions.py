@@ -10,3 +10,9 @@ class ImageProcessingError(Exception):
     def __init__(self, message="Image processing error"):
         self.message = message
         super().__init__(self.message)
+
+class ModelLoadingError(Exception):
+    """Custom exception class raised when the model fails to load."""
+    def __init__(self, message="model loading error"):
+        self.message = message
+        super().__init__(self.message)

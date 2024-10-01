@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.schemas.request import InferenceRequest
-from app.schemas.response import InferenceResponse
+from app.schemas.inference_scheme import InferenceRequest, InferenceResponse
 from app.services.model_inference import run_inference_service
 from app.utils.custom_exceptions import ModelNotFoundError, ImageProcessingError
 
@@ -21,6 +20,4 @@ async def run_inference(request: InferenceRequest):
         raise HTTPException(status_code=500)
 
 
-@router.post("/reload_models/{model_name}")
-async def reload_model(model_name: str):
-    pass
+

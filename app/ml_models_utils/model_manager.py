@@ -8,7 +8,8 @@ import asyncio
 
 import numpy as np
 from tensorflow.keras.models import load_model
-
+import threading
+from app.utils.custom_exceptions import ModelLoadingError
 
 
 class ModelManager:
@@ -16,7 +17,7 @@ class ModelManager:
         self.model_directory = settings.WEIGHTS_DIR
         self.loaded_models ={}
         self.class_dict = {}
-
+        self.model_locks = {}
 
     @lru_cache(maxsize=10)
     def load_model(self, model_name: str):
@@ -30,8 +31,15 @@ class ModelManager:
         # Check if model file exists locally
         if os.path.exists(model_file_path):
             #print(f"Loading model from local file: {model_file_path}")
-            model = load_model(model_file_path)
-            self.loaded_models[model_name] = model
+            lock = self.model_locks.setdefault(model_name, threading.Lock())
+            with lock:
+                try:
+                    model = load_model(model_file_path)
+                except Exception as e:
+                    raise e
+                if not model:
+                    raise ModelLoadingError(f"Model {model_name} failed to load")
+                self.loaded_models[model_name] = model
         else:
             #print(f"File not found: {model_file_path}")
             raise FileNotFoundError(f"Model {model_name} not found at {model_file_path}")

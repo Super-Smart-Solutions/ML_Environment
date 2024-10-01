@@ -1,7 +1,7 @@
 from app.utils.s3_utils import download_image_from_s3
 from app.utils.image_utils import preprocess_image
 # from app.ml_models_utils.model_manager import ModelManager
-from app.schemas.response import InferenceResponse
+from app.schemas.inference_scheme import InferenceResponse
 import numpy as np
 from app.utils.custom_exceptions import ModelNotFoundError, ImageProcessingError
 from app.utils.model_utils import model_manager, get_disease_name
@@ -24,8 +24,12 @@ async def run_inference_service(model_name: str, presigned_url: str) -> Inferenc
     except Exception as e:
         raise ImageProcessingError(f"Image Processing error {str(e)}")
 
-    # Run inference
-    predictions = model.predict(preprocessed_image)
+    lock = model_manager.model_locks.get(model_name)
+    if not lock:
+        raise ModelNotFoundError(f"Model {model_name} lock not found.")
+    with lock:
+        # Run inference
+        predictions = model.predict(preprocessed_image)
     
 
     # Check if predictions is already a flat list of floats
@@ -41,8 +45,8 @@ async def run_inference_service(model_name: str, presigned_url: str) -> Inferenc
 
     predicted_class_index = np.argmax(prediction_list)
     confidence = prediction_list[predicted_class_index]
-    print("predictions: ", predictions, type(predictions) )
-    print("confidence", confidence, type(confidence))
+    #print("predictions: ", predictions, type(predictions) )
+    #print("confidence", confidence, type(confidence))
 
 
     try:
@@ -50,7 +54,7 @@ async def run_inference_service(model_name: str, presigned_url: str) -> Inferenc
     except Exception as e:
         raise e
 
-    print("class: ", disease_name, type(disease_name) )
+    #print("class: ", disease_name, type(disease_name) )
 
     #Free Memory (SAFETY!)
     del image
