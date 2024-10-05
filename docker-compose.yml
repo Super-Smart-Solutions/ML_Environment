@@ -1,0 +1,31 @@
+services:
+  ml_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ml_api_container
+    ports:
+      - "8000:8000"  # Internal access; external access handled by Nginx
+    volumes:
+      - ./app/weights:/app/src/weights
+    env_file:
+      - .env
+    environment:
+      - ENVIRONMENT=${ML_APIS_ENVIRONMENT}
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_container
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      # - ./certs:/etc/nginx/certs  # If using SSL
+    depends_on:
+      - ml_api
+    restart: unless-stopped
+
+# volumes:
+#   weights_data:
