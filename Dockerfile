@@ -34,8 +34,6 @@ RUN --mount=type=cache,target=/tmp/poetry_cache poetry install --only main
 
 CMD ["/usr/local/bin/python", "-m", "app"]
 
-# Define environment variable
-#ENV NAME=production
 
 FROM prod AS dev
 #ENV NAME=development

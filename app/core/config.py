@@ -1,5 +1,6 @@
 import enum
 import os
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 class LogLevel(str, enum.Enum):
     """Possible log levels."""
@@ -34,16 +35,22 @@ class Settings(BaseSettings):
     log_level: LogLevel = LogLevel.INFO
 
     #AWS S3
-    AWS_DEFAULT_REGION: str = ""
+    AWS_DEFAULT_REGION: str = Fie
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
-    AWS_BUCKET_NAME: str = ""
+    AWS_WEIGHTS_BUCKET_NAME: str = ""
+    AWS_IMAGES_BUCKET_NAME: str = ""
+
+    #Weights [absolute path]
+    WEIGHTS_DIR: str = os.path.join(os.path.dirname(__file__), "../weights")
+    VERSIONS_PATH: str = os.path.join(os.path.dirname(__file__), "../weights/versions.json")
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=os.path.join(os.path.dirname(__file__), "../.env"),
         env_prefix="ML_APIS_",
         env_file_encoding="utf-8",
     )
 
 # Instantiate the settings
 settings = Settings()
+
