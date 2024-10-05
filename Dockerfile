@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.9.18 AS prod
+FROM python:3.11.9 AS prod
 
 RUN apt-get update && apt-get install -y \
   gcc \
