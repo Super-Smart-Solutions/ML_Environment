@@ -8,7 +8,7 @@ router = APIRouter()
 @router.post("/predict", response_model=InferenceResponse)
 async def run_inference(request: InferenceRequest):
     try:
-        result = await run_inference_service(request.model_name, request.presigned_url)
+        result = await run_inference_service(request.model_name.lower(), request.presigned_url)
         if not result:
             raise HTTPException(status_code=500, detail="inference failed.")        
         return result

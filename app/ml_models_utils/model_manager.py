@@ -65,6 +65,6 @@ class ModelManager:
 
         if result:
             # Load the model from the downloaded file
-            self.load_model(model_name)
+            self.load_model(model_name.lower())
         else:
             raise Exception(f"Failed to retrive model {model_name}, from bucket {settings.AWS_WEIGHTS_BUCKET_NAME}.")
