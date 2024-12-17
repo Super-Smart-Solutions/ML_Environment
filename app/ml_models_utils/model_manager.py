@@ -26,7 +26,7 @@ class ModelManager:
         """
 
         # Define the path for the model file
-        model_file_path = os.path.join(self.model_directory,"models",f"{model_name}", f"{model_name}_model.h5")
+        model_file_path = os.path.join(self.model_directory,"models",f"{model_name.lower()}", f"{model_name.lower()}_model.h5")
 
         # Check if model file exists locally
         if os.path.exists(model_file_path):
@@ -60,7 +60,7 @@ class ModelManager:
             return True if os.path.exists(downloaded_file_path) else False
 
 
-        model_key = f"models/{model_name}/{model_name}_model.h5"
+        model_key = f"models/{model_name.lower()}/{model_name.lower()}_model.h5"
         result = await _get_model(object_key=model_key)
 
         if result:
