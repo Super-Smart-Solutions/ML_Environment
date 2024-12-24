@@ -46,23 +46,29 @@ async def run_inference_service(model_name: str, presigned_url: str) -> Inferenc
 
     if len(prediction_list) == 1:
         predicted_class_index = 1 if prediction_list[0] >= 0.5 else 0
+        confidence = prediction_list[0]
+        is_healthy = False
     else:
         predicted_class_index = np.argmax(prediction_list)
+        confidence = prediction_list[predicted_class_index]
+        if confidence < 0.5:
+            is_healthy = True
 
     
     print("predictions list: ", prediction_list)
     print("predictions index: ", predicted_class_index)
-    confidence = prediction_list[predicted_class_index]
-    #print("predictions: ", predictions, type(predictions) )
-    #print("confidence", confidence, type(confidence))
+    print("confidence", confidence, type(confidence))
 
 
     try:
-        disease_name = get_disease_name(model_name, predicted_class_index)
+        if not is_healthy:
+            disease_name = get_disease_name(model_name, predicted_class_index)
+        else:
+            disease_name = "healthy"
     except Exception as e:
         raise e
 
-    #print("class: ", disease_name, type(disease_name) )
+    print("class: ", disease_name, type(disease_name) )
 
     #Free Memory (SAFETY!)
     del image
