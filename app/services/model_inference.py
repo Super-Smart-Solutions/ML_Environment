@@ -31,6 +31,7 @@ async def run_inference_service(model_name: str, presigned_url: str) -> Inferenc
         # Run inference
         predictions = model.predict(preprocessed_image)
     
+    print("predictions: ", predictions)
 
     # Check if predictions is already a flat list of floats
     if isinstance(predictions, np.ndarray):
@@ -43,7 +44,14 @@ async def run_inference_service(model_name: str, presigned_url: str) -> Inferenc
         raise ValueError("Predictions should be a numpy array or a list of floats")
 
 
-    predicted_class_index = np.argmax(prediction_list)
+    if len(prediction_list) == 1:
+        predicted_class_index = 1 if prediction_list[0] >= 0.5 else 0
+    else:
+        predicted_class_index = np.argmax(prediction_list)
+
+    
+    print("predictions list: ", prediction_list)
+    print("predictions index: ", predicted_class_index)
     confidence = prediction_list[predicted_class_index]
     #print("predictions: ", predictions, type(predictions) )
     #print("confidence", confidence, type(confidence))
