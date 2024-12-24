@@ -51,13 +51,13 @@ async def run_inference_service(model_name: str, presigned_url: str) -> Inferenc
     else:
         predicted_class_index = np.argmax(prediction_list)
         confidence = prediction_list[predicted_class_index]
-        is_healthy = True if confidence < 0.5 else False
+        is_healthy = True if confidence < 0.6 else False
         
 
     
-    print("predictions list: ", prediction_list)
-    print("predictions index: ", predicted_class_index)
-    print("confidence", confidence, type(confidence))
+    # print("predictions list: ", prediction_list)
+    # print("predictions index: ", predicted_class_index)
+    # print("confidence", confidence, type(confidence))
 
 
     try:
@@ -68,7 +68,7 @@ async def run_inference_service(model_name: str, presigned_url: str) -> Inferenc
     except Exception as e:
         raise e
 
-    print("class: ", disease_name, type(disease_name) )
+    # print("class: ", disease_name, type(disease_name) )
 
     #Free Memory (SAFETY!)
     del image
