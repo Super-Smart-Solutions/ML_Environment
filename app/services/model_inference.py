@@ -46,7 +46,10 @@ async def run_inference_service(model_name: str, presigned_url: str) -> Inferenc
 
     if len(prediction_list) == 1:
         predicted_class_index = 1 if prediction_list[0] >= 0.5 else 0
-        confidence = prediction_list[0]
+        if prediction_list:
+            confidence = prediction_list[0]
+        else:
+            confidence = 1.0 - float(prediction_list[0])
         is_healthy = False
     else:
         predicted_class_index = np.argmax(prediction_list)
