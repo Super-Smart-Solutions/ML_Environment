@@ -20,10 +20,15 @@ def get_app() -> FastAPI:
     register_startup_event(app)
     register_shutdown_event(app)
     
+    origins = [
+    "https://pd.ss-solution.org",
+    "https://plant-backend.ss-solution.org",
+]
+    
     # CORS setup
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
